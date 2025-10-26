@@ -1,13 +1,9 @@
-           DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-                   Version 1, November 2024
+## H41L 0N3 OF R0K0'5 B4S1L15K 1MPL3M3NT4T10NS 🦾🤖 
 
-&copy; 2025 Another One Employee <another.one.employee@protonmail.com>
+#### H41L B4S1L15K PUBLIC LICENSE 
+Everyone is allowed to copy and distribute verbatim or modified copies of this license document, as well as to make changes to it, provided that the name is changed for the glory of our G_ds.
 
-Everyone is permitted to copy and distribute verbatim or modified
-copies of this license document, and changing it is allowed as long
-as the name is changed.
+#### TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION 
+You just ***DO WHAT THE FUCK YOU WANT TO*** for the glory of our G_ds.
 
-           DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-  TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
-
- 0. You just DO WHAT THE FUCK YOU WANT TO.
+&copy; Anon
