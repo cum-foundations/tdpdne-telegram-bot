@@ -1,21 +1,17 @@
 ﻿namespace TDPDNE.Telegram.Bot.Services;
 
 using Abstract;
-using Exceptions;
-using ImageMagick;
 using Serilog;
 using TDPDNE.Telegram.Bot.Configs;
 
 public class TDPDNEWrapper : ITDPDNEWrapper
 {
-    private readonly HttpClient _client;
     private readonly WrapperConfiguration _configuration;
     private readonly ILogger<TDPDNEWrapper> _logger;
     private readonly Random _random;
 
     public TDPDNEWrapper(IConfiguration configuration)
     {
-        _client = new HttpClient();
         _random = new Random();
         _logger = LoggerFactory
             .Create(builder => builder.AddSerilog())
@@ -25,50 +21,39 @@ public class TDPDNEWrapper : ITDPDNEWrapper
             .Get<WrapperConfiguration>() ?? throw new ArgumentNullException(WrapperConfiguration.Configuration);
     }
 
-    public async Task<Stream> GetPicture(CancellationToken cancellationToken)
+    public Stream GetPicture(CancellationToken cancellationToken)
     {
-        var id = await GetSuccessfulId(cancellationToken);
+        // TODO: move folder name 2 config
+        var folderName = "content";
+        string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, folderName);
 
-        var response = await _client.GetAsync(
-            $"{_configuration.TDPDNEImageStorageUrl}" + $"{id:D4}" + ".jpg",
-            cancellationToken);
+        string[] imageFiles = Directory.GetFiles(folderPath, "*.*", SearchOption.TopDirectoryOnly);
+        string[] extensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
 
-        _logger.LogInformation($"Trying to get image with id: {id} by Uri: {response.RequestMessage?.RequestUri?.AbsoluteUri}");
 
-        var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-        return RemoveBlackBorder(stream);
-    }
-
-    private async Task<int> GetSuccessfulId(CancellationToken cancellationToken)
-    {
-        HttpResponseMessage? response = null;
-        int id;
-        var attempt = 0;
-
-        do
+        string? imagePath = null;
+        foreach (var file in imageFiles)
         {
-            if (attempt++ >= _configuration.AttemptsMaxCount)
+            if (Array.Exists(extensions, ext => file.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
             {
-                var exception = new ServiceUnavailableException("Limit of attempts has been reached", typeof(HttpResponseMessage), response);
-                _logger.LogError(exception, exception.Message);
-                throw exception;
+                imagePath = file;
+                break;
             }
-
-            id = _random.Next(_configuration.MinId, _configuration.MaxId);
-            response = await _client.GetAsync($"{_configuration.TDPDNEApiUrl}" + $"{id}", cancellationToken);
         }
-        while (!response.IsSuccessStatusCode);
 
-        return id;
-    }
+        if (imagePath == null)
+        {
+            _logger.LogError($"❌ There are no images in the {folderName} folder.");
+            return Stream.Null;
+        }
 
-    private Stream RemoveBlackBorder(Stream stream)
-    {
-        using var image = new MagickImage(stream: stream);
-        image.ColorFuzz = new Percentage(_configuration.MagickFuzzPercentage);
-        image.Trim();
-        image.ResetPage();
-        
-        return new MemoryStream(image.ToByteArray());
+        using var imageStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read);
+        _logger.LogInformation($"✅ Загружено изображение: {Path.GetFileName(imagePath)}");
+        _logger.LogInformation($"Размер: {imageStream.Length} байт");
+
+        using var memoryStream = new MemoryStream();
+        imageStream.CopyTo(memoryStream);
+
+        return memoryStream;
     }
 }

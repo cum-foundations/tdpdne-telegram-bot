@@ -81,7 +81,7 @@ public class UpdateHandler : IUpdateHandler
 
             try
             {
-                var content = await Wrapper.GetPicture(cancellationToken);
+                var content = Wrapper.GetPicture(cancellationToken);
 
                 return await botClient.SendPhotoAsync(
                     chatId: message.Chat.Id,

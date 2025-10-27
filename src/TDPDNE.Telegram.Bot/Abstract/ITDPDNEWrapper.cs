@@ -2,5 +2,5 @@
 
 public interface ITDPDNEWrapper
 {
-    Task<Stream> GetPicture(CancellationToken stoppingToken);
+    Stream GetPicture(CancellationToken stoppingToken);
 }
